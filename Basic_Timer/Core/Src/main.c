@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,11 +62,6 @@ static void MX_TIM6_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
-{
-    //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5); //onboard LED
-	//HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_13); // Breadboard LED
-}
 /* USER CODE END 0 */
 
 /**
@@ -78,7 +73,6 @@ int main(void)
   /* USER CODE BEGIN 1 */
   char uart_buf[50];
   int uart_buf_len;
-  uint16_t timer_val;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -106,34 +100,20 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // Say something
-  uart_buf_len = sprintf(uart_buf, "Timer Test\r\n");
+  uart_buf_len = snprintf(uart_buf, sizeof(uart_buf), "Timer Test\r\n");
   HAL_UART_Transmit(&huart2, (uint8_t *)uart_buf, uart_buf_len, 100);
 
-  // Start timer
-  HAL_TIM_Base_Start(&htim6);
+  // Start timers
+  //HAL_TIM_Base_Start(&htim6);
+  HAL_TIM_Base_Start_IT(&htim6);
+  HAL_TIM_Base_Start_IT(&htim2);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	// Get current time (microseconds)
-	timer_val = __HAL_TIM_GET_COUNTER(&htim6);
-
-	// Wait for 50 ms
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-	HAL_Delay(50);
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-
-	// Get time elapsed
-	timer_val = __HAL_TIM_GET_COUNTER(&htim6) - timer_val;
-
-	// Show elapsed time
-	uart_buf_len = sprintf(uart_buf, "%u us\r\n", timer_val);
-	HAL_UART_Transmit(&huart2, (uint8_t *)uart_buf, uart_buf_len, 100);
-
-	// Wait again so we don't flood the Serial terminal
-	HAL_Delay(1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -295,9 +275,9 @@ static void MX_TIM6_Init(void)
 
   /* USER CODE END TIM6_Init 1 */
   htim6.Instance = TIM6;
-  htim6.Init.Prescaler = 79;
+  htim6.Init.Prescaler = 7999;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim6.Init.Period = 65535;
+  htim6.Init.Period = 9999;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {
@@ -364,6 +344,9 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
@@ -374,6 +357,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PC0 */
+  GPIO_InitStruct.Pin = GPIO_PIN_0;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LD2_Pin */
   GPIO_InitStruct.Pin = LD2_Pin;
@@ -392,7 +382,14 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
+{
+	if (htim == &htim2) {
+	    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5); //onboard LED
+	} else if (htim == &htim6) {
+		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_0); // Breadboard LED
+	}
+}
 /* USER CODE END 4 */
 
 /**
