@@ -12,7 +12,7 @@
 
 #include "LCD16x2.h"
 #include "LCD16x2_cfg.h"
-#include "../../delay_functions/DWT_Delay.h"
+#include "DWT_Delay.h"
 
 
 //-----[ Alphanumeric LCD 16x2 Routines ]-----
@@ -149,13 +149,13 @@ void LCD_Write_String(char *str)
     for(i=0;str[i]!='\0';i++)
        LCD_Write_Char(str[i]);
 }
-void LCD_SL()
+void LCD_SL() // Shift Display Left (command 0x18)
 {
     LCD_CMD(0x01);
     LCD_CMD(0x08);
     DWT_Delay_us(35);
 }
-void LCD_SR()
+void LCD_SR() // Shift Display Left (command 0x1C)
 {
     LCD_CMD(0x01);
     LCD_CMD(0x0C);

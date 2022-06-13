@@ -1,7 +1,7 @@
 #ifndef LCD16X2_H_
 #define LCD16X2_H_
  
-#include "stm32f1xx_hal.h"
+#include "stm32f4xx_hal.h"
  
 typedef struct
 {
