@@ -40,6 +40,7 @@
 
 /* Private variables ---------------------------------------------------------*/
  ADC_HandleTypeDef hadc1;
+DMA_HandleTypeDef hdma_adc1;
 
 TIM_HandleTypeDef htim2;
 
@@ -53,8 +54,9 @@ UART_HandleTypeDef huart2;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
-static void MX_TIM2_Init(void);
+static void MX_DMA_Init(void);
 static void MX_ADC1_Init(void);
+static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -93,8 +95,9 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
-  MX_TIM2_Init();
+  MX_DMA_Init();
   MX_ADC1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
@@ -108,13 +111,7 @@ int main(void)
   while (1)
   {
 	// Start ADC Conversion
-    HAL_ADC_Start_IT(&hadc1);
-    // Poll ADC1 Perihperal & TimeOut = 1mSec
-    HAL_ADC_PollForConversion(&hadc1, 1);
-
-    // Read The ADC Conversion Result & Map It To PWM DutyCycle (moved to interrupt handler)
-    //AD_RES = HAL_ADC_GetValue(&hadc1);
-    TIM2->CCR1 = (AD_RES<<6);
+    HAL_ADC_Start_DMA(&hadc1, &AD_RES, 1);
 
     // Because I don't have an oscilloscope, also print the value to serial
     char sendBuf[30] = { 0 };
@@ -321,6 +318,22 @@ static void MX_USART2_UART_Init(void)
 }
 
 /**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA2_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA2_Stream0_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -355,7 +368,8 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
-	AD_RES = HAL_ADC_GetValue(&hadc1);
+    // Read The ADC Conversion Result & Map It To PWM DutyCycle
+    TIM2->CCR1 = (AD_RES<<6);
 }
 /* USER CODE END 4 */
 
