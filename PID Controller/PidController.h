@@ -18,27 +18,27 @@
 
 class PidController {
     public:
-        PidController();
-        PidController& operator=(const PidController& other);
-        ~PidController();
-        PidController(double proportionWeight, double integralWeight, double derivativeWeight, double setPoint);
+		PidController();
+		PidController& operator=(const PidController& other);
+		~PidController();
+		PidController(double proportionWeight, double integralWeight, double derivativeWeight, double setPoint);
 
-        /* Primary functions for using the PID controller */
+		/* Primary functions for using the PID controller */
 		double nextOutput(double input);
-        double getSetPoint(void);
-        void setSetPoint(double setPoint);
+		double getSetPoint(void);
+		void setSetPoint(double setPoint);
 
-        /* Utility functions. PID weights are not typically changed on the fly but is allowed */
+		/* Utility functions. PID weights are not typically changed on the fly but is allowed */
 		double getProportionWeight(void);
 		double getIntegralWeight(void);
 		double getDerivativeWeight(void);
-        void setPid(double proportionWeight, double integralWeight, double derivativeWeight);
+		void setPid(double proportionWeight, double integralWeight, double derivativeWeight);
 
-    private:
+	private:
 		double proportionWeight;
 		double integralWeight;
 		double derivativeWeight;
-        double setPoint;
+		double setPoint;
 		double prevError;
 		double cumulativeIntegral;
         
