@@ -17,7 +17,7 @@
 */
 
 class PidController {
-    public:
+	public:
 		PidController();
 		PidController& operator=(const PidController& other);
 		~PidController();
