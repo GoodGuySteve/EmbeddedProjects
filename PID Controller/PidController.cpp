@@ -1,5 +1,4 @@
 #include "PidController.h"
-#include <iostream>
 
 PidController::PidController() {
     this->setPoint = 0;
@@ -47,11 +46,6 @@ double PidController::nextOutput(double input) {
     double derivativeOutput = this->derivativeWeight * (error - this->prevError);
     this->prevError = error;
 
-#if defined(VERBOSE)
-    // Log the output - nice for debugging
-    //std::cout << "output: " << (proportionOutput + integralOutput + derivativeOutput) << std::endl;
-#endif
-
     return proportionOutput + integralOutput + derivativeOutput;
 }
 
@@ -59,7 +53,8 @@ double PidController::getSetPoint(void) {
     return this->setPoint;
 }
 
-/* Change the target value of the input signal that the PID controller is aiming for. */ 
+/* Change the target value of the input signal that the PID controller is aiming to
+   reach and maintain */ 
 void PidController::setSetPoint(double setPoint) {
     this->setPoint = setPoint;
 }

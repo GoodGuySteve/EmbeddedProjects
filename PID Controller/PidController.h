@@ -21,11 +21,19 @@ class PidController {
 		PidController();
 		PidController& operator=(const PidController& other);
 		~PidController();
-		PidController(double proportionWeight, double integralWeight, double derivativeWeight, double setPoint);
+		PidController(double proportionWeight, double integralWeight, double derivativeWeight,
+			double setPoint);
 
 		/* Primary functions for using the PID controller */
+
+		/* Given an input value, generate an output value intended to adjust the input value 
+		towards the setPoint. The input signal should therefore be correlated somehow with 
+		the output of the PidController. */
 		double nextOutput(double input);
+		/* Get the value of the input signal the PID controller is attempting to achieve. */
 		double getSetPoint(void);
+		/* Set a new value for the PID controller to attempt to move the input signal towards.
+		This can be adjusted on the fly. */
 		void setSetPoint(double setPoint);
 
 		/* Utility functions. PID weights are not typically changed on the fly but is allowed */
