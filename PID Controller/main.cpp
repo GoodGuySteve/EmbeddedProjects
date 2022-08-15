@@ -115,7 +115,7 @@ int main(int argc, char* argv[]) {
 	// To rerun a random test, replace this seed with the seed from the previous run. 
 	unsigned int seed = (unsigned int)time(NULL);
 	rng.seed(seed);
-    cout << "Beginning tests with random seed " << seed << "... " << endl;
+	cout << "Beginning tests with random seed " << seed << "... " << endl;
 
 	// Perfect signal - no lag, offset, or interference
 	testConvergence(1000, 0, 200, 0, scale, "idealTest");
@@ -132,7 +132,7 @@ int main(int argc, char* argv[]) {
 
 	testConvergence(1000, 4000, 1300, 20, noise, "noiseTest");
     
-    cout << "Tests complete!" << endl;
+	cout << "Tests complete!" << endl;
 
 	// There's plenty more tests I could add here to test each of the parameters more
 	// thoroughly as well as testing under more process profiles and with different
